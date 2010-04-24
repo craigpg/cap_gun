@@ -25,7 +25,12 @@ module CapGun
     end
     
     def current_user
-      Etc.getlogin
+      username = case capistrano[:scm].to_sym
+        when :git
+          username = `git config --get user.name`
+          exit_code.success? ? username : nil
+      end
+      username || Etc.getlogin
     end
 
     def summary
